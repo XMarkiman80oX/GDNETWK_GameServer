@@ -14,6 +14,14 @@ namespace GDNETWK_GameServer
         public int id;
         public TCP tcp;
         public UDP udp;
+        public bool isReady = false;
+        public bool hasReplied = false;
+        public bool hasVotedForReply = false;
+        public bool hasVotedForPrompt = false;
+
+        public string username;
+        public int points = 0;
+        public int votes = 0;
 
         public Client(int _clientId)
         {
@@ -72,7 +80,7 @@ namespace GDNETWK_GameServer
                     int _byteLength = stream.EndRead(_result);
                     if(_byteLength <= 0)
                     {
-                        //todo: dc
+                        Server.clients[id].Disconnect();
                         return;
                     }
 
@@ -86,7 +94,8 @@ namespace GDNETWK_GameServer
                 catch(Exception _ex)
                 {
                     Console.Write($"Error receiving TCP data: {_ex}");
-                    //todo: dc
+                    Server.clients[id].Disconnect();
+
                 }
             }
 
@@ -138,6 +147,16 @@ namespace GDNETWK_GameServer
 
                 return false;
             }
+
+            public void Disconnect()
+            {
+                socket.Close();
+                stream = null;
+                receivedData = null;
+                receieveBuffer = null;
+                socket = null;
+                
+            }
         }
 
         public class UDP
@@ -178,8 +197,31 @@ namespace GDNETWK_GameServer
                 });
                 
             }
+
+            public void Disconnect()
+            {
+                endPoint = null;
+            }
         }
 
-        
+        private void Disconnect()
+        {
+            Console.WriteLine($"{tcp.socket.Client.RemoteEndPoint} has disconnected");
+            Server.playerCount--;
+            points = 0;
+            votes = 0;
+            hasReplied = false;
+            hasVotedForReply = false;
+            hasVotedForPrompt = false;
+            tcp.Disconnect();
+            udp.Disconnect();
+
+            ServerSend.TCPPlayerDisconnect(id);
+        }
+
+        public bool isTCPConnected()
+        {
+            return !(tcp.socket == null);
+        }
     }
 }

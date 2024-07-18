@@ -11,14 +11,55 @@ namespace GDNETWK_GameServer
     public enum ServerPackets
     {
         welcome = 1,
-        udpTest
+        udpTest,
+        playerReadyReceived,
+        PromptChoicesSend,
+        PromptSelectReceived,
+        RiddleSend,
+        FinishedRoundReceived,
+        PlayerListSend,
+        PlayerListRequestReceived,
+        AnswerAttemptReceived,
+        ChatMessageReceived,
+        ChatMessageForwardSend,
+        PlayerDisconnectSend,
+        HostSetPromptReceived,
+        HostPromptRelaySend,
+        PromptReplyReceived,
+        PromptReplyRelaySend,
+        AllPlayersRepliedSend,
+        VoteForReplyReceived,
+        VotedForReplyRelaySend,
+        HighestVotesSend,
+        TimerSend
     }
 
     /// <summary>Sent from client to server.</summary>
     public enum ClientPackets
     {
         welcomeReceived = 1,
-        udpTestReceived
+        udpTestReceived,
+        playerReadysend,
+        PromptChoicesReceived,
+        PromptSelectSend,
+        RiddleReceive,
+        FinishedRoundSend,
+        PlayerListReceived,
+        PlayerListRequested,
+        AnswerAttemptSend,
+        ChatMessageSend,
+        ChatMessageForwardReceived,
+        PlayerDisconnectReceived,
+        HostSetPromptSend,
+        HostPromptRelayReceived,
+        PromptReplySend,
+        PromptReplyRelayReceived,
+        AllPlayersRepliedReceived,
+        VoteForReplySend,
+        VotedForReplyRelayReceived,
+        HighestVotesReceived,
+        TimerReceived
+
     }
 
     public class Packet : IDisposable

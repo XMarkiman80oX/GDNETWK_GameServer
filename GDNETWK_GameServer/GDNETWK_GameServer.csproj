@@ -46,9 +46,11 @@
     <Compile Include="Client.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GameLogic.cs" />
+    <Compile Include="ImagePromptTitle.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RiddleGenerator.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerHandler.cs" />
     <Compile Include="ServerSend.cs" />

@@ -9,21 +9,25 @@ namespace GDNETWK_GameServer
 {
     class Server
     {
-        public static RiddleGenerator rg = new RiddleGenerator();
+        public static RiddleGenerator riddleGenerator;
         public static int MaxPlayers { get; private set; }
+        public static int playerCount = 0;
         public static int Port { get; private set; }
         public static Dictionary<int, Client> clients = new Dictionary<int, Client>();
         public delegate void PacketHandler(int _fromClient, Packet _packet);
         public static Dictionary<int, PacketHandler> packetHandlers;
 
-        private static TcpListener tcListener;
+        private static TcpListener tcpListener;
         private static UdpClient udpListener;
 
-        
+        public static int[] promptChoiceVotes = new int[3] { 0, 0, 0 };
+        public static int[] riddleIndexes = new int[3] { 0, 0, 0 };
 
+        public static float timer = 0.0f;
+        public static bool isTimerRunning = false;
         public static void Start(int _maxPLayers, int _port)
         {
-
+            
             MaxPlayers = _maxPLayers;
             Port = _port;
 
@@ -38,8 +42,8 @@ namespace GDNETWK_GameServer
             udpListener.BeginReceive(UDPReceiveCallback, null);
 
             Console.WriteLine($"Server started on {Port}.");
-            
 
+            riddleGenerator = new RiddleGenerator();
         }
 
         private static void TCPConnectCallback(IAsyncResult _result)
@@ -127,13 +131,37 @@ namespace GDNETWK_GameServer
             packetHandlers = new Dictionary<int, PacketHandler>()
             {
                 { (int)ClientPackets.welcomeReceived, ServerHandler.TCPTestReceived },
-                { (int)ClientPackets.udpTestReceived, ServerHandler.UDPTestReceived }
+                { (int)ClientPackets.udpTestReceived, ServerHandler.UDPTestReceived },
+                { (int)ClientPackets.playerReadysend, ServerHandler.TCPPlayerReadyReceived },
+                { (int)ClientPackets.PromptSelectSend, ServerHandler.TCPPromptSelectReceived },
+                { (int)ClientPackets.FinishedRoundSend, ServerHandler.TCPPlayerReadyReceived },
+                { (int)ClientPackets.AnswerAttemptSend, ServerHandler.TCPAnswerAttemptReceived },
+                { (int)ClientPackets.PlayerListRequested, ServerHandler.TCPPlayerListRequestReceived },
+                { (int)ClientPackets.ChatMessageSend, ServerHandler.TCPChatMessageReceived },
+                { (int)ClientPackets.PromptReplySend, ServerHandler.TCPPromptReplyReceived },
+                { (int)ClientPackets.VoteForReplySend, ServerHandler.TCPVoteForReplyReceived }
 
-            };
+
+
+        };
 
             Console.WriteLine("Initialized Packets");
         }
+
+        public static void StartTimer()
+        {
+            isTimerRunning = true;
+            Server.timer = 0;
+        }
+
+        public static void EndTimer()
+        {
+            isTimerRunning = false;
+            
+        }
     }
+
+    
 
 
 }

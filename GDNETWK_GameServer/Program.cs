@@ -10,6 +10,7 @@ namespace GDNETWK_GameServer
     class Program
     {
         public static bool isRunning = false;
+
         static void Main(string[] args)
         {
             Console.Title = "Game Server";
@@ -17,21 +18,33 @@ namespace GDNETWK_GameServer
 
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
-            Server.Start(50, 26950);
+            Server.Start(50, 26951);
 
-            
+           
         }
 
         private  static void MainThread()
         {
             Console.WriteLine($"Main thread started. Running at {Constants.TICKS_PER_SEC} ticks per second");
             DateTime _nextLoop = DateTime.Now;
+            DateTime time1 = DateTime.Now;
+            DateTime time2 = DateTime.Now;
 
-            while(isRunning)
+
+            while (isRunning)
             {
-                while(_nextLoop <DateTime.Now)
+                
+
+                while (_nextLoop <DateTime.Now)
                 {
-                    GameLogic.Update();
+                    time2 = DateTime.Now;
+                    float deltaTime = (time2.Ticks - time1.Ticks) / 10000000f;
+                    Console.WriteLine(deltaTime);  // *float* output {0,2493331}
+                                                   //Console.WriteLine(time2.Ticks - time1.Ticks); // *int* output {2493331}
+                    time1 = time2;
+
+
+                    GameLogic.Update(deltaTime);
                     _nextLoop = _nextLoop.AddMilliseconds(Constants.MS_PER_TICK);
 
                     if(_nextLoop > DateTime.Now)
