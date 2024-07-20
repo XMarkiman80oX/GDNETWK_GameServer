@@ -39,13 +39,8 @@ namespace GDNETWK_GameServer
                 {
                     time2 = DateTime.Now;
                     float deltaTime = (time2.Ticks - time1.Ticks) / 10000000f;
-<<<<<<< Updated upstream
-                    Console.WriteLine(deltaTime);  // *float* output {0,2493331}
-                                                   //Console.WriteLine(time2.Ticks - time1.Ticks); // *int* output {2493331}
-=======
                     //Console.WriteLine(deltaTime);  // *float* output {0,2493331}
                                                   
->>>>>>> Stashed changes
                     time1 = time2;
 
 

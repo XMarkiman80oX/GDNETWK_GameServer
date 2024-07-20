@@ -107,11 +107,7 @@ namespace GDNETWK_GameServer
                 int rndIndex;
                 do
                 {
-<<<<<<< Updated upstream
-                    rndIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
-=======
                     rndIndex = rnd.Next(Server.riddleGenerator.promptList.Count);
->>>>>>> Stashed changes
                     Console.WriteLine(rndIndex);
                 }
 
@@ -121,13 +117,6 @@ namespace GDNETWK_GameServer
 
             using (Packet _packet = new Packet(((int)ServerPackets.PromptChoicesSend)))
             {
-<<<<<<< Updated upstream
-                _packet.Write(Server.riddleGenerator.riddleBook[Server.riddleIndexes[0]].Key);
-                _packet.Write(Server.riddleGenerator.riddleBook[Server.riddleIndexes[1]].Key);
-                _packet.Write(Server.riddleGenerator.riddleBook[Server.riddleIndexes[2]].Key); 
-                SendTCPDataToAll(_packet);
-            }
-=======
                 _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[0]]);
                 _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[1]]);
                 _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[2]]); 
@@ -135,25 +124,10 @@ namespace GDNETWK_GameServer
             }
 
             Server.StartSelectTimer();
->>>>>>> Stashed changes
         }
 
         public static void TCPSendRiddleToClients(int _index)
         {
-<<<<<<< Updated upstream
-            
-
-            
-            
-
-            //int randRiddleIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
-            string riddle = Server.riddleGenerator.riddleBook[_index].Key;
-            string answer = Server.riddleGenerator.riddleBook[_index].Value;
-            using (Packet _packet = new Packet(((int)ServerPackets.RiddleSend)))
-            {
-                _packet.Write(riddle);
-                _packet.Write(answer);
-=======
 
 
 
@@ -165,7 +139,6 @@ namespace GDNETWK_GameServer
             using (Packet _packet = new Packet(((int)ServerPackets.RiddleSend)))
             {
                 _packet.Write(riddle);
->>>>>>> Stashed changes
                 SendTCPDataToAll(_packet);
             }
 
@@ -262,10 +235,7 @@ namespace GDNETWK_GameServer
 
         public static void TCPAllPlayersRepliedSend()
         {
-<<<<<<< Updated upstream
-=======
             Server.StartReplyTimer();
->>>>>>> Stashed changes
             string _msg = "All players have replied";
             using (Packet _packet = new Packet(((int)ServerPackets.AllPlayersRepliedSend)))
             {
@@ -273,11 +243,8 @@ namespace GDNETWK_GameServer
                 SendTCPDataToAll(_packet);
 
             }
-<<<<<<< Updated upstream
-=======
 
             Server.isVotingBestReply = true;
->>>>>>> Stashed changes
         }
 
         public static void TCPVoteForReplyRelaySend(int _id)
@@ -305,22 +272,14 @@ namespace GDNETWK_GameServer
 
         public static void TCPTimerSend()
         {
-<<<<<<< Updated upstream
-            float _currentTimerValue = Server.timer;
-=======
             float _currentTimerValue = Server.promptReplyTimer;
->>>>>>> Stashed changes
             using (Packet _packet = new Packet(((int)ServerPackets.TimerSend)))
             {
                 _packet.Write(_currentTimerValue);   //client with highest votes
                 SendTCPDataToAll(_packet);
 
             }
-<<<<<<< Updated upstream
-            Console.WriteLine("sending");
-=======
             //Console.WriteLine("sending");
->>>>>>> Stashed changes
         }
     }
 }

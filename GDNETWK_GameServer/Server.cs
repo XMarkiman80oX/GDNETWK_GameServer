@@ -23,16 +23,11 @@ namespace GDNETWK_GameServer
         public static int[] promptChoiceVotes = new int[3] { 0, 0, 0 };
         public static int[] riddleIndexes = new int[3] { 0, 0, 0 };
 
-<<<<<<< Updated upstream
-        public static float timer = 0.0f;
-        public static bool isTimerRunning = false;
-=======
         public static float promptReplyTimer = 25.0f;
         public static float promptSelectTimer = 8.0f;
         public static bool isReplyTimerRunning = false;
         public static bool isSelectTimerRunning = false;
         public static bool isVotingBestReply = false;
->>>>>>> Stashed changes
         public static void Start(int _maxPLayers, int _port)
         {
             
@@ -148,32 +143,14 @@ namespace GDNETWK_GameServer
                 { (int)ClientPackets.ChatMessageSend, ServerHandler.TCPChatMessageReceived },
                 { (int)ClientPackets.PromptReplySend, ServerHandler.TCPPromptReplyReceived },
                 { (int)ClientPackets.VoteForReplySend, ServerHandler.TCPVoteForReplyReceived }
-<<<<<<< Updated upstream
-=======
-
-
->>>>>>> Stashed changes
 
 
 
-        };
+            };
 
             Console.WriteLine("Initialized Packets");
         }
 
-<<<<<<< Updated upstream
-        public static void StartTimer()
-        {
-            isTimerRunning = true;
-            Server.timer = 0;
-        }
-
-        public static void EndTimer()
-        {
-            isTimerRunning = false;
-            
-        }
-=======
         public static void StartReplyTimer()
         {
             isReplyTimerRunning = true;
@@ -197,7 +174,6 @@ namespace GDNETWK_GameServer
             isSelectTimerRunning = false;
 
         }
->>>>>>> Stashed changes
     }
 
     
