@@ -23,8 +23,16 @@ namespace GDNETWK_GameServer
         public static int[] promptChoiceVotes = new int[3] { 0, 0, 0 };
         public static int[] riddleIndexes = new int[3] { 0, 0, 0 };
 
+<<<<<<< Updated upstream
         public static float timer = 0.0f;
         public static bool isTimerRunning = false;
+=======
+        public static float promptReplyTimer = 25.0f;
+        public static float promptSelectTimer = 8.0f;
+        public static bool isReplyTimerRunning = false;
+        public static bool isSelectTimerRunning = false;
+        public static bool isVotingBestReply = false;
+>>>>>>> Stashed changes
         public static void Start(int _maxPLayers, int _port)
         {
             
@@ -140,6 +148,11 @@ namespace GDNETWK_GameServer
                 { (int)ClientPackets.ChatMessageSend, ServerHandler.TCPChatMessageReceived },
                 { (int)ClientPackets.PromptReplySend, ServerHandler.TCPPromptReplyReceived },
                 { (int)ClientPackets.VoteForReplySend, ServerHandler.TCPVoteForReplyReceived }
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 
 
 
@@ -148,6 +161,7 @@ namespace GDNETWK_GameServer
             Console.WriteLine("Initialized Packets");
         }
 
+<<<<<<< Updated upstream
         public static void StartTimer()
         {
             isTimerRunning = true;
@@ -159,6 +173,31 @@ namespace GDNETWK_GameServer
             isTimerRunning = false;
             
         }
+=======
+        public static void StartReplyTimer()
+        {
+            isReplyTimerRunning = true;
+            Server.promptReplyTimer = 25;
+        }
+
+        public static void StartSelectTimer()
+        {
+            isSelectTimerRunning = true;
+            Server.promptSelectTimer = 8.0f;
+        }
+
+        public static void EndReplyTimer()
+        {
+            isReplyTimerRunning = false;
+            
+        }
+
+        public static void EndSelectTimer()
+        {
+            isSelectTimerRunning = false;
+
+        }
+>>>>>>> Stashed changes
     }
 
     

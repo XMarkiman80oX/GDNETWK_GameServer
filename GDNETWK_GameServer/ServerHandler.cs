@@ -103,15 +103,34 @@ namespace GDNETWK_GameServer
                 if(Server.promptChoiceVotes[i] > _highestVotedPrompt)
                 {
                     _highestVotedPrompt = Server.promptChoiceVotes[i];
+<<<<<<< Updated upstream
                     promptIndex = Server.riddleIndexes[i];
+=======
+                    //promptIndex = Server.riddleIndexes[i];
+>>>>>>> Stashed changes
                 }
             }
 
             Console.WriteLine(promptIndex);
             if (_hasAllPlayerSelectedPrompt)
             {
+<<<<<<< Updated upstream
                 ServerSend.TCPSendRiddleToClients(promptIndex);
                 Server.StartTimer();
+=======
+                int rngIndex = 0;
+                Random rng = new Random();
+                do
+                {
+                    rngIndex = rng.Next(3);
+                    promptIndex = Server.riddleIndexes[rngIndex];
+                }
+                while (Server.promptChoiceVotes[rngIndex] != _highestVotedPrompt);
+
+                ServerSend.TCPSendRiddleToClients(promptIndex);
+                Server.EndSelectTimer();
+                
+>>>>>>> Stashed changes
             }
                 
 
@@ -142,7 +161,10 @@ namespace GDNETWK_GameServer
             Console.WriteLine($"Received packet via TCP from client. Contains info: {_msg}");
             ServerSend.TCPSendPlayerList(_fromClient);
 
+<<<<<<< Updated upstream
             //todo: send player into the game
+=======
+>>>>>>> Stashed changes
         }
 
         public static void TCPChatMessageReceived(int _fromClient, Packet _packet)
@@ -175,6 +197,10 @@ namespace GDNETWK_GameServer
             {
                 Console.WriteLine("All players have replied. Enabling voting.");
                 ServerSend.TCPAllPlayersRepliedSend();
+<<<<<<< Updated upstream
+=======
+                
+>>>>>>> Stashed changes
             }
                 
         }
@@ -218,6 +244,11 @@ namespace GDNETWK_GameServer
                 //}
                 //int _points = Server.clients[_id].points++;
                 //ServerSend.TCPHighestVotesSend(_id, _highestVotes);
+<<<<<<< Updated upstream
+=======
+
+                
+>>>>>>> Stashed changes
             }
         }
 
