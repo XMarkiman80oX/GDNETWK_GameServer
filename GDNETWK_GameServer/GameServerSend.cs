@@ -138,7 +138,7 @@ namespace GDNETWK_GameServer
             GameServer.StartTimer();
             //int randRiddleIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
             
-            using (Packet _packet = new Packet(((int)GameServerPackets.RiddleSend)))
+            using (Packet _packet = new Packet(((int)GameServerPackets.ChoiceSend)))
             {
                 _packet.Write(_index);
                 SendTCPDataToAll(_packet);

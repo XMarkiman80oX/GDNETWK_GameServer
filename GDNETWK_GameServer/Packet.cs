@@ -43,6 +43,32 @@ namespace GDNETWK_GameServer
         //PromptStartGame,
         PromptChoicesSend,
         PromptSelectReceived,
+        ChoiceSend,
+        FinishedRoundReceived,
+        PlayerListSend,
+        PlayerListRequestReceived,
+        AnswerAttemptReceived,
+        ChatMessageReceived,
+        ChatMessageForwardSend,
+        PlayerDisconnectSend,
+        HostSetPromptReceived,
+        HostPromptRelaySend,
+        PromptReplyReceived,
+        PromptReplyRelaySend,
+        AllPlayersRepliedSend,
+        VoteForReplyReceived,
+        VotedForReplyRelaySend,
+        HighestVotesSend,
+        TimerSend
+    }
+    /// <summary>Sent from server to client.</summary>
+    public enum ServerPackets
+    {
+        welcome = 1,
+        udpTest,
+        playerReadyReceived,
+        PromptChoicesSend,
+        PromptSelectReceived,
         RiddleSend,
         FinishedRoundReceived,
         PlayerListSend,
@@ -61,7 +87,6 @@ namespace GDNETWK_GameServer
         HighestVotesSend,
         TimerSend
     }
-
     /// <summary>Sent from client to server.</summary>
     public enum ClientPackets
     {

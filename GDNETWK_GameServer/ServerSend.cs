@@ -131,7 +131,7 @@ namespace GDNETWK_GameServer
             Server.isVotingBestReply = false;
             //int randRiddleIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
             string riddle = Server.riddleGenerator.promptList[_index];
-            using (Packet _packet = new Packet(((int)GameServerPackets.RiddleSend)))
+            using (Packet _packet = new Packet(((int)GameServerPackets.ChoiceSend)))
             {
                 _packet.Write(riddle);
                 SendTCPDataToAll(_packet);
