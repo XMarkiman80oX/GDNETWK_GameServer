@@ -1,46 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GDNETWK_GameServer
 {
     /// <summary>Sent from server to client.</summary>
-    /// 
-    public enum GameClientPackets
-    {
-        welcomeReceived = 1,
-        udpTestReceived,
-        playerReadysend,
-        PromptPlayButton,
-        PromptChoicesReceived,
-        PromptSelectSend,
-        RiddleReceive,
-        FinishedRoundSend,
-        PlayerListReceived,
-        PlayerListRequested,
-        AnswerAttemptSend,
-        ChatMessageSend,
-        ChatMessageForwardReceived,
-        PlayerDisconnectReceived,
-        HostSetPromptSend,
-        HostPromptRelayReceived,
-        PromptReplySend,
-        PromptReplyRelayReceived,
-        AllPlayersRepliedReceived,
-        VoteForReplySend,
-        VotedForReplyRelayReceived,
-        HighestVotesReceived,
-        TimerReceived
-
-    }
-    public enum GameServerPackets
+    public enum ServerPackets
     {
         welcome = 1,
         udpTest,
         playerReadyReceived,
-        PressedPlayReceived,
-        //PromptStartGame,
         PromptChoicesSend,
         PromptSelectReceived,
         RiddleSend,
@@ -90,14 +61,14 @@ namespace GDNETWK_GameServer
 
     }
 
-    public class Packet : IDisposable
+    public class GamePacket : IDisposable
     {
         private List<byte> buffer;
         private byte[] readableBuffer;
         private int readPos;
 
         /// <summary>Creates a new empty packet (without an ID).</summary>
-        public Packet()
+        public GamePacket()
         {
             buffer = new List<byte>(); // Intitialize buffer
             readPos = 0; // Set readPos to 0
@@ -105,7 +76,7 @@ namespace GDNETWK_GameServer
 
         /// <summary>Creates a new packet with a given ID. Used for sending.</summary>
         /// <param name="_id">The packet ID.</param>
-        public Packet(int _id)
+        public GamePacket(int _id)
         {
             buffer = new List<byte>(); // Intitialize buffer
             readPos = 0; // Set readPos to 0
@@ -115,7 +86,7 @@ namespace GDNETWK_GameServer
 
         /// <summary>Creates a packet from which data can be read. Used for receiving.</summary>
         /// <param name="_data">The bytes to add to the packet.</param>
-        public Packet(byte[] _data)
+        public GamePacket(byte[] _data)
         {
             buffer = new List<byte>(); // Intitialize buffer
             readPos = 0; // Set readPos to 0

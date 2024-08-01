@@ -1,28 +1,29 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GDNETWK_GameServer
 {
-    class ServerHandler
+    class GameServerHandler
     {
         public static void TCPTestReceived(int _fromClient, Packet _packet)
         {
             int _clientIdCheck = _packet.ReadInt();
             string _username = _packet.ReadString();
 
-            Console.WriteLine($"Received packet via TCP from client. Contains info: {Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected succesfully and is now player {_fromClient} with username {_username}");
+            Console.WriteLine("_fromClient: " + _fromClient);
+
+            Console.WriteLine($"Received packet via TCP from client. Contains info: {GameServer.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected succesfully and is now player {_fromClient} with username {_username}");
 
             if (_fromClient != _clientIdCheck)
             {
                 Console.WriteLine($"Player \"{_username}\" (ID: {_fromClient} has assumed the wrong client ID ({_clientIdCheck})");
             }
 
-            Server.clients[_fromClient].username = _username;
-            Server.playerCount++;
+            GameServer.clients[_fromClient].username = _username;
+            GameServer.playerCount++;
             //todo: send player into the game
         }
 
@@ -35,43 +36,82 @@ namespace GDNETWK_GameServer
 
         public static void TCPPlayerReadyReceived(int _fromClient, Packet _packet)
         {
+            string playerName = "";
             bool _isPlayerReady = _packet.ReadBool();
 
             Console.WriteLine($"Player {_fromClient} set ready to {_isPlayerReady}");
 
-            Server.clients[_fromClient].isReady = _isPlayerReady;
+            GameServer.clients[_fromClient].isReady = _isPlayerReady;
+            playerName = GameServer.clients[_fromClient].username;
 
             bool _isAllPlayerReady = true;
 
-            foreach(Client _client in Server.clients.Values)
+            foreach (GameClient _client in GameServer.clients.Values)
             {
                 if (_client.isTCPConnected() && _client.isReady == false)
                 {
-                    Console.WriteLine("Player Count: " + Server.playerCount);
+                    Console.WriteLine("CLIENT: " +  _client);
+                    Console.WriteLine(Server.playerCount);
                     Console.WriteLine("Not all players are ready");
+
+                    //player2Name = _client.username;
                     _isAllPlayerReady = false;
                     break;
                 }
             }
 
-            ServerSend.TCPPlayerReadyReceivedConfirm(_isAllPlayerReady);
+            GameServerSend.TCPPlayerReadyReceivedConfirm(_isAllPlayerReady);
 
-            if (_isAllPlayerReady) 
-                ServerSend.TCPSendPromptChoices();
+            if (_isAllPlayerReady)
+            {
+                Console.WriteLine("Inside TCPPlayerReadyReceived -> playerName:" + playerName);
+                //Console.WriteLine("Inside TCPPlayerReadyReceived -> player2Name:" + player2Name);
+
+                GameServerSend.TCPLoadRPSGame(playerName);
+            }
 
             //todo: send player into the game
+        }
+        public static void TCPPromptPlayButton(int _fromClient, Packet _packet)
+        {
+            bool _hasClickedPlay = _packet.ReadBool();
+
+            if(_hasClickedPlay)
+                Console.WriteLine($"Player {_fromClient} clicked PLAY");
+            else
+                Console.WriteLine($"Player {_fromClient} HAS NOT clicked PLAY");
+
+            GameServer.clients[_fromClient].hasClickedPlay = _hasClickedPlay;
+
+            bool _isAllPlayerReady = true;
+
+            foreach (GameClient _client in GameServer.clients.Values)
+            {
+                if (_client.isTCPConnected() && _client.isReady == false)
+                {
+                    Console.WriteLine("Not all clicked play");
+
+                    _isAllPlayerReady = false;
+                    break;
+                }
+            }
+
+            //GameServerSend.TCPPlayerPlayButtonConfirmed(_isAllPlayerReady);
+
+            if (_isAllPlayerReady)
+            {
+                GameServerSend.TCPPlayerPlayButtonConfirmed(_isAllPlayerReady);
+                //GameServerSend.TCPStartRPSGame();
+            }
         }
 
         public static void TCPPromptSelectReceived(int _fromClient, Packet _packet)
         {
             int _choice = _packet.ReadInt();
-            Server.promptChoiceVotes[_choice]++;
-            Server.clients[_fromClient].hasVotedForPrompt = true;
-
-
+            GameServer.clients[_fromClient].hasVotedForPrompt = true;
 
             bool _hasAllPlayerSelectedPrompt = true;
-            foreach (Client _client in Server.clients.Values)
+            foreach (GameClient _client in GameServer.clients.Values)
             {
                 if (_client.isTCPConnected() && _client.hasVotedForPrompt == false)
                 {
@@ -81,35 +121,12 @@ namespace GDNETWK_GameServer
                     break;
                 }
             }
-            int _highestVotedPrompt = 0;
-            int promptIndex = 0;
-            
-            for (int i = 0; i < 3; i++)
-            {
-                if(Server.promptChoiceVotes[i] > _highestVotedPrompt)
-                {
-                    _highestVotedPrompt = Server.promptChoiceVotes[i];
-                    //promptIndex = Server.riddleIndexes[i];
-                }
-            }
-
-            Console.WriteLine(promptIndex);
             if (_hasAllPlayerSelectedPrompt)
             {
-                int rngIndex = 0;
-                Random rng = new Random();
-                do
-                {
-                    rngIndex = rng.Next(3);
-                    promptIndex = Server.riddleIndexes[rngIndex];
-                }
-                while (Server.promptChoiceVotes[rngIndex] != _highestVotedPrompt);
+                GameServerSend.TCPRevealMoves(_choice);
+                GameServer.EndSelectTimer();
 
-                ServerSend.TCPSendRiddleToClients(promptIndex);
-                Server.EndSelectTimer();
-                
             }
-                
 
             //todo: send player into the game
         }
@@ -119,43 +136,41 @@ namespace GDNETWK_GameServer
             string _answerGuess = _packet.ReadString();
             bool _isAnswerCorrect = _packet.ReadBool();
 
-            if(_isAnswerCorrect)
+            if (_isAnswerCorrect)
             {
-                Server.clients[_fromClient].points++;
+                GameServer.clients[_fromClient].points++;
             }
 
             Console.WriteLine($"Received packet via TCP from client. Contains info: client {_fromClient} attempted to answer with {_answerGuess}. Did client guess correctly {_isAnswerCorrect}");
 
 
-            ServerSend.TCPSendAttemptPromptToAllExcept(_fromClient, _answerGuess, _isAnswerCorrect);
+            GameServerSend.TCPSendAttemptPromptToAllExcept(_fromClient, _answerGuess, _isAnswerCorrect);
             //todo: send player into the game
         }
 
         public static void TCPPlayerListRequestReceived(int _fromClient, Packet _packet)
         {
-
             string _msg = _packet.ReadString();
             Console.WriteLine($"Received packet via TCP from client. Contains info: {_msg}");
-            ServerSend.TCPSendPlayerList(_fromClient);
-
+            GameServerSend.TCPSendPlayerList(_fromClient);
         }
 
         public static void TCPChatMessageReceived(int _fromClient, Packet _packet)
         {
             string _msg = _packet.ReadString();
-            Console.WriteLine($"Received packet via TCP from client. Contains info: {Server.clients[_fromClient].username} chatted to all users: { _msg}");
-            ServerSend.TCPMessageForward(_fromClient, _msg);
+            Console.WriteLine($"Received packet via TCP from client. Contains info: {Server.clients[_fromClient].username} chatted to all users: {_msg}");
+            GameServerSend.TCPMessageForward(_fromClient, _msg);
         }
 
         public static void TCPPromptReplyReceived(int _clientIndex, Packet _packet)
         {
             string _msg = _packet.ReadString();
-            Console.WriteLine($"Received packet via TCP from client. Contains info: {Server.clients[_clientIndex].username} replied to the prompt with: { _msg}");
-            Server.clients[_clientIndex].hasReplied = true;
-            ServerSend.TCPPromptReplyRelaySend(_clientIndex, _msg);
+            Console.WriteLine($"Received packet via TCP from client. Contains info: {Server.clients[_clientIndex].username} replied to the prompt with: {_msg}");
+            GameServer.clients[_clientIndex].hasReplied = true;
+            GameServerSend.TCPPromptReplyRelaySend(_clientIndex, _msg);
 
             bool _hasAllPlayersReplied = true;
-            foreach (Client _client in Server.clients.Values)
+            foreach (GameClient _client in GameServer.clients.Values)
             {
                 if (_client.isTCPConnected() && _client.hasReplied == false)
                 {
@@ -169,24 +184,24 @@ namespace GDNETWK_GameServer
             if (_hasAllPlayersReplied)
             {
                 Console.WriteLine("All players have replied. Enabling voting.");
-                ServerSend.TCPAllPlayersRepliedSend();
-                
+                GameServerSend.TCPAllPlayersRepliedSend();
+
             }
-                
+
         }
 
         public static void TCPVoteForReplyReceived(int _fromClient, Packet _packet)
         {
             int _receiver = _packet.ReadInt();
             Console.WriteLine($"Received packet via TCP from client. Contains info: {_fromClient} voted for {_receiver}'s reply");
-            Server.clients[_receiver].votes++;
-            Server.clients[_fromClient].hasVotedForReply = true;
+            GameServer.clients[_receiver].votes++;
+            GameServer.clients[_fromClient].hasVotedForReply = true;
 
-            ServerSend.TCPVoteForReplyRelaySend(_receiver);
+            GameServerSend.TCPVoteForReplyRelaySend(_receiver);
 
 
             bool _hasAllPlayersVoted = true;
-            foreach (Client _client in Server.clients.Values)
+            foreach (GameClient _client in GameServer.clients.Values)
             {
                 if (_client.isTCPConnected() && _client.hasVotedForReply == false)
                 {
@@ -197,7 +212,7 @@ namespace GDNETWK_GameServer
                 }
             }
 
-            if(_hasAllPlayersVoted)
+            if (_hasAllPlayersVoted)
             {
                 //int _highestVotes = 0;
                 //int _id = 0;
@@ -215,7 +230,7 @@ namespace GDNETWK_GameServer
                 //int _points = Server.clients[_id].points++;
                 //ServerSend.TCPHighestVotesSend(_id, _highestVotes);
 
-                
+
             }
         }
 

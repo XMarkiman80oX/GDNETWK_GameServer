@@ -23,7 +23,7 @@ namespace GDNETWK_GameServer
 
                         foreach (Client _client in Server.clients.Values)
                         {
-                            if (_client.hasReplied = true)
+                            if (_client.hasReplied == true)
                             {
                                 isThereAReply = true;
                                 break;
@@ -88,6 +88,7 @@ namespace GDNETWK_GameServer
                 {
                     Random rng = new Random();
                     int riddleIndex = rng.Next(3);
+                    Console.WriteLine("Errors in Game Logic");
                     ServerSend.TCPSendRiddleToClients(Server.riddleIndexes[riddleIndex]);
                     Server.EndSelectTimer();
                 }

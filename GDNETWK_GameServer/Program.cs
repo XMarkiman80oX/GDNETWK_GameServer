@@ -10,7 +10,7 @@ namespace GDNETWK_GameServer
     class Program
     {
         public static bool isRunning = false;
-
+        public static bool isRPSGame = true;
         static void Main(string[] args)
         {
             Console.Title = "Game Server";
@@ -18,7 +18,10 @@ namespace GDNETWK_GameServer
 
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
-            Server.Start(50, 26951);
+            if(isRPSGame)
+                GameServer.Start(2, 26951);
+            else
+                Server.Start(50, 26951);
 
            
         }
@@ -43,8 +46,11 @@ namespace GDNETWK_GameServer
                                                   
                     time1 = time2;
 
+                    if(isRPSGame)
+                        GameGameLogic.Update(deltaTime);
+                    else
+                        GameLogic.Update(deltaTime);
 
-                    GameLogic.Update(deltaTime);
                     _nextLoop = _nextLoop.AddMilliseconds(Constants.MS_PER_TICK);
 
                     if(_nextLoop > DateTime.Now)

@@ -1,61 +1,61 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GDNETWK_GameServer
 {
-    class ServerSend
+    class GameServerSend
     {
-
         private static void SendTCPData(int _toClient, Packet _packet)
         {
             _packet.WriteLength();
-            Server.clients[_toClient].tcp.SendData(_packet);
+            GameServer.clients[_toClient].tcp.SendData(_packet);
         }
 
         private static void SendUDPData(int _toClient, Packet _packet)
         {
             _packet.WriteLength();
-            Server.clients[_toClient].udp.SendData(_packet);
+            GameServer.clients[_toClient].udp.SendData(_packet);
         }
 
         private static void SendTCPDataToAll(Packet _packet)
         {
             _packet.WriteLength();
-            for (int i = 1; i <= Server.MaxPlayers; i++)
+            for (int i = 1; i <= GameServer.MaxPlayers; i++)
             {
-                Server.clients[i].tcp.SendData(_packet);
+                GameServer.clients[i].tcp.SendData(_packet);
             }
         }
 
         private static void SendTCPDataToAll(int _exceptClient, Packet _packet)
         {
             _packet.WriteLength();
-            for (int i = 1; i <= Server.MaxPlayers; i++)
+            for (int i = 1; i <= GameServer.MaxPlayers; i++)
             {
-                if(i != _exceptClient)
-                    Server.clients[i].tcp.SendData(_packet);
+                if (i != _exceptClient)
+                    GameServer.clients[i].tcp.SendData(_packet);
             }
         }
 
         private static void SendUDPDataToAll(Packet _packet)
         {
             _packet.WriteLength();
-            for (int i = 1; i <= Server.MaxPlayers; i++)
+            for (int i = 1; i <= GameServer.MaxPlayers; i++)
             {
-                Server.clients[i].udp.SendData(_packet);
+                GameServer.clients[i].udp.SendData(_packet);
             }
         }
 
         private static void SendUDPDataToAll(int _exceptClient, Packet _packet)
         {
             _packet.WriteLength();
-            for (int i = 1; i <= Server.MaxPlayers; i++)
+            for (int i = 1; i <= GameServer.MaxPlayers; i++)
             {
                 if (i != _exceptClient)
-                    Server.clients[i].udp.SendData(_packet);
+                    GameServer.clients[i].udp.SendData(_packet);
             }
         }
 
@@ -82,6 +82,17 @@ namespace GDNETWK_GameServer
 
             }
         }
+        public static void TCPPlayerPlayButtonConfirmed(bool _hasAllPressed)
+        {
+            string _msg = "player ready status change received";
+            bool _gameStart = _hasAllPressed;
+            using (Packet _packet = new Packet(((int)GameServerPackets.PressedPlayReceived)))
+            {
+                _packet.Write(_msg);
+                _packet.Write(_gameStart);
+                SendTCPDataToAll(_packet);
+            }
+        }
         public static void TCPPlayerReadyReceivedConfirm(bool _isAllPlayerReady)
         {
             string _msg = "player ready status change received";
@@ -93,51 +104,47 @@ namespace GDNETWK_GameServer
                 SendTCPDataToAll(_packet);
             }
         }
+        //public static void TCPStartRPSGame()
+        //{
+        //    using (Packet _packet = new Packet((int)GameServerPackets.PromptStartGame))
+        //    {
+        //        _packet.Write("This will send to Start Game");
+        //        Console.WriteLine("Start RPS Game Sent to Client");
+        //    }
 
-        public static void TCPSendPromptChoices()
+        //    //GameServer.StartSelectTimer();
+        //}
+        public static void TCPLoadRPSGame(string playerName)
         {
-            Server.promptChoiceVotes = new int[3] { 0, 0, 0 };
-            Random rnd = new Random();
-
-            Server.riddleIndexes = new int[3];
-
-            for (int i = 0; i < 3; i++)
-            {
-                int rndIndex;
-                do
-                {
-                    rndIndex = rnd.Next(Server.riddleGenerator.promptList.Count);
-                    Console.WriteLine(rndIndex);
-                }
-
-                while (Server.riddleIndexes.Contains(rndIndex));
-                Server.riddleIndexes[i] = rndIndex;
-            }
+            //GameServer.rockPaperOrScissors[0] = EChoice.ROCK;
+            //GameServer.rockPaperOrScissors[1] = EChoice.PAPER;
+            //GameServer.rockPaperOrScissors[2] = EChoice.SCISSORS;
 
             using (Packet _packet = new Packet(((int)GameServerPackets.PromptChoicesSend)))
             {
-                _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[0]]);
-                _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[1]]);
-                _packet.Write(Server.riddleGenerator.promptList[Server.riddleIndexes[2]]); 
+                //_packet.Write((int)GameServer.rockPaperOrScissors[0]);
+                //_packet.Write((int)GameServer.rockPaperOrScissors[1]);
+                //_packet.Write((int)GameServer.rockPaperOrScissors[2]);
+                Console.WriteLine("Inside TCPSendPromptChoices -> playerName:" + playerName);
+
+                _packet.Write(playerName);
+                //_packet.Write(player2Name);
                 SendTCPDataToAll(_packet);
             }
-
-            Server.StartSelectTimer();
         }
 
-        public static void TCPSendRiddleToClients(int _index)
+        public static void TCPRevealMoves(int _index) //TCPSendRiddleToClients
         {
-            Server.StartReplyTimer();
-            Server.isVotingBestReply = false;
+            GameServer.StartTimer();
             //int randRiddleIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
-            string riddle = Server.riddleGenerator.promptList[_index];
+            
             using (Packet _packet = new Packet(((int)GameServerPackets.RiddleSend)))
             {
-                _packet.Write(riddle);
+                _packet.Write(_index);
                 SendTCPDataToAll(_packet);
             }
 
-            foreach(Client _client in Server.clients.Values)
+            foreach (Client _client in Server.clients.Values)
             {
                 _client.votes = 0;
                 _client.isReady = false;
@@ -145,17 +152,16 @@ namespace GDNETWK_GameServer
                 _client.hasVotedForReply = false;
                 _client.hasVotedForPrompt = false;
             }
-          
         }
 
         public static void TCPSendPlayerList(int _toClient)
         {
 
-            for(int i = 1; i <= Server.playerCount; i++)
+            for (int i = 1; i <= GameServer.playerCount; i++)
             {
-                int _clientID = Server.clients[i].id;
-                string _username = Server.clients[i].username;
-                int _points = Server.clients[i].points;
+                int _clientID = GameServer.clients[i].id;
+                string _username = GameServer.clients[i].username;
+                int _points = GameServer.clients[i].points;
 
                 using (Packet _packet = new Packet(((int)GameServerPackets.PlayerListSend)))
                 {
@@ -168,13 +174,13 @@ namespace GDNETWK_GameServer
                 }
             }
 
-            
+
         }
 
         public static void TCPSendAttemptPromptToAllExcept(int _exceptClient, string _answerGuess, bool _isAnswerCorrect)
         {
-            
-                
+
+
             using (Packet _packet = new Packet(((int)GameServerPackets.AnswerAttemptReceived)))
             {
 
@@ -185,7 +191,7 @@ namespace GDNETWK_GameServer
                 SendTCPDataToAll(_exceptClient, _packet);
 
             }
-            
+
 
 
         }
@@ -221,7 +227,7 @@ namespace GDNETWK_GameServer
             {
                 _packet.Write(_senderClient);   //client that sent a prompt reply
                 _packet.Write(_promptReply);   //client reply to prompt
-                
+
 
                 SendTCPDataToAll(_packet);
 
@@ -230,20 +236,20 @@ namespace GDNETWK_GameServer
 
         public static void TCPAllPlayersRepliedSend()
         {
-            Server.StartReplyTimer();
-            string _msg = "All players have replied";
-            using (Packet _packet = new Packet(((int)GameServerPackets.AllPlayersRepliedSend)))
-            {
-                _packet.Write(_msg);   
-                SendTCPDataToAll(_packet);
-            }
+            GameServer.StartTimer();
+            //string _msg = "All players have replied";
+            //using (Packet _packet = new Packet(((int)GameServerPackets.AllPlayersRepliedSend)))
+            //{
+            //    _packet.Write(_msg);
+            //    SendTCPDataToAll(_packet);
+            //}
 
-            Server.isVotingBestReply = true;
+            //Server.isVotingBestReply = true;
         }
 
         public static void TCPVoteForReplyRelaySend(int _id)
         {
-            int _votes = Server.clients[_id].votes;
+            int _votes = GameServer.clients[_id].votes;
             using (Packet _packet = new Packet(((int)GameServerPackets.VotedForReplyRelaySend)))
             {
                 _packet.Write(_id);
@@ -266,7 +272,7 @@ namespace GDNETWK_GameServer
 
         public static void TCPTimerSend()
         {
-            float _currentTimerValue = Server.promptReplyTimer;
+            float _currentTimerValue = GameServer.promptReplyTimer;
             using (Packet _packet = new Packet(((int)GameServerPackets.TimerSend)))
             {
                 _packet.Write(_currentTimerValue);   //client with highest votes

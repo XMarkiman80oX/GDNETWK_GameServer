@@ -45,7 +45,13 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="EChoice.cs" />
+    <Compile Include="GameClient.cs" />
+    <Compile Include="GameGameLogic.cs" />
     <Compile Include="GameLogic.cs" />
+    <Compile Include="GameServer.cs" />
+    <Compile Include="GameServerHandler.cs" />
+    <Compile Include="GameServerSend.cs" />
     <Compile Include="ImagePromptTitle.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="Program.cs" />
