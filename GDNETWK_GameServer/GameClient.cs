@@ -17,6 +17,8 @@ namespace GDNETWK_GameServer
         public bool hasVotedForReply = false;
         public bool hasVotedForPrompt = false;
 
+        public EChoice chosenMove = EChoice.NONE;
+
         public string username;
         public int points = 0;
         public int votes = 0;

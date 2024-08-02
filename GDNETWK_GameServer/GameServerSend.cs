@@ -132,15 +132,14 @@ namespace GDNETWK_GameServer
                 SendTCPDataToAll(_packet);
             }
         }
-
-        public static void TCPRevealMoves(int _index) //TCPSendRiddleToClients
+        public static void TCPRevealMoves(int playerIndex, int _index) //TCPSendRiddleToClients
         {
-            GameServer.StartTimer();
             //int randRiddleIndex = rnd.Next(Server.riddleGenerator.riddleBook.Count);
             
             using (Packet _packet = new Packet(((int)GameServerPackets.ChoiceSend)))
             {
                 _packet.Write(_index);
+                _packet.Write(playerIndex);
                 SendTCPDataToAll(_packet);
             }
 
@@ -149,9 +148,8 @@ namespace GDNETWK_GameServer
                 _client.votes = 0;
                 _client.isReady = false;
                 _client.hasReplied = false;
-                _client.hasVotedForReply = false;
-                _client.hasVotedForPrompt = false;
             }
+            GameServer.StartTimer();
         }
 
         public static void TCPSendPlayerList(int _toClient)

@@ -36,7 +36,6 @@ namespace GDNETWK_GameServer
 
             while (isRunning)
             {
-                
 
                 while (_nextLoop <DateTime.Now)
                 {

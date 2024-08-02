@@ -109,6 +109,8 @@ namespace GDNETWK_GameServer
         {
             int _choice = _packet.ReadInt();
             GameServer.clients[_fromClient].hasVotedForPrompt = true;
+            GameServer.clients[_fromClient].chosenMove = (EChoice) _choice;
+
 
             bool _hasAllPlayerSelectedPrompt = true;
             foreach (GameClient _client in GameServer.clients.Values)
@@ -123,9 +125,8 @@ namespace GDNETWK_GameServer
             }
             if (_hasAllPlayerSelectedPrompt)
             {
-                GameServerSend.TCPRevealMoves(_choice);
+                GameServerSend.TCPRevealMoves(_fromClient, _choice);
                 GameServer.EndSelectTimer();
-
             }
 
             //todo: send player into the game
