@@ -114,21 +114,12 @@ namespace GDNETWK_GameServer
 
         //    //GameServer.StartSelectTimer();
         //}
-        public static void TCPLoadRPSGame(string playerName)
+        public static void TCPLoadRPSGame(string player1Name, string player2Name)
         {
-            //GameServer.rockPaperOrScissors[0] = EChoice.ROCK;
-            //GameServer.rockPaperOrScissors[1] = EChoice.PAPER;
-            //GameServer.rockPaperOrScissors[2] = EChoice.SCISSORS;
-
             using (Packet _packet = new Packet(((int)GameServerPackets.PromptChoicesSend)))
             {
-                //_packet.Write((int)GameServer.rockPaperOrScissors[0]);
-                //_packet.Write((int)GameServer.rockPaperOrScissors[1]);
-                //_packet.Write((int)GameServer.rockPaperOrScissors[2]);
-                Console.WriteLine("Inside TCPSendPromptChoices -> playerName:" + playerName);
-
-                _packet.Write(playerName);
-                //_packet.Write(player2Name);
+                _packet.Write(player1Name);
+                _packet.Write(player2Name);
                 SendTCPDataToAll(_packet);
             }
         }

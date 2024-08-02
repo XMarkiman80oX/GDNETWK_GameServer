@@ -36,24 +36,29 @@ namespace GDNETWK_GameServer
 
         public static void TCPPlayerReadyReceived(int _fromClient, Packet _packet)
         {
-            string playerName = "";
+            string player1Name = "", player2Name = "" ;
             bool _isPlayerReady = _packet.ReadBool();
 
             Console.WriteLine($"Player {_fromClient} set ready to {_isPlayerReady}");
 
             GameServer.clients[_fromClient].isReady = _isPlayerReady;
-            playerName = GameServer.clients[_fromClient].username;
 
             bool _isAllPlayerReady = true;
 
+            int counter = 0;
             foreach (GameClient _client in GameServer.clients.Values)
             {
+                counter++;
                 if (_client.isTCPConnected() && _client.isReady == false)
                 {
                     Console.WriteLine("CLIENT: " +  _client);
                     Console.WriteLine(Server.playerCount);
                     Console.WriteLine("Not all players are ready");
 
+                    if(counter == 1)
+                        player1Name = _client.username;
+                    else if (counter == 2)
+                        player2Name = _client.username;
                     //player2Name = _client.username;
                     _isAllPlayerReady = false;
                     break;
@@ -64,10 +69,7 @@ namespace GDNETWK_GameServer
 
             if (_isAllPlayerReady)
             {
-                Console.WriteLine("Inside TCPPlayerReadyReceived -> playerName:" + playerName);
-                //Console.WriteLine("Inside TCPPlayerReadyReceived -> player2Name:" + player2Name);
-
-                GameServerSend.TCPLoadRPSGame(playerName);
+                GameServerSend.TCPLoadRPSGame(player1Name, player2Name);
             }
 
             //todo: send player into the game
